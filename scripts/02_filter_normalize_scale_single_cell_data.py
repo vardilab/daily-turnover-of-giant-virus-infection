@@ -8,7 +8,7 @@ import scprep
 def main():
     args = get_args()
     print('Loading data')
-    data = load_data(args.data_dir, args.file_type)
+    data = load_data(args.data_dir, args.file_type, args.data_file)
     # remove clutter from gene names
     new_columns = pd.Series(data.columns).str.split('\t', expand=True)[0]
     data.columns = new_columns.to_list()
@@ -37,32 +37,30 @@ def main():
     print('Scale data')
     data = scale_data(data)
     print('Saving preprocessed data file')
-    data.to_pickle(os.path.join(args.data_dir, "data.pickle.gz"))
-    metadata.to_pickle(os.path.join(args.data_dir, "metadata.pickle.gz"))
+    data.to_pickle(os.path.join(args.data_dir, "data.scaled.pickle.gz"))
+    metadata.to_pickle(os.path.join(args.data_dir, "metadata.scaled.pickle.gz"))
 
 def get_args():
     parser = ArgumentParser(description="Preprocess Single-Cell Data: Filter, Normalize, Scale.")
-    parser.add_argument("--data_dir", help="path to direcory with 10X outputs: matrix.mtx.gz, features.tsv.gz, barcodes.tsv.gz)", required=True)
-    parser.add_argument("--file_type", help="Note if the input count matrix is in format mtx, csv, or tsv (default: mtx)", default='mtx')
+    parser.add_argument("--data_dir", help="path to direcory with input files", required=True)
+    parser.add_argument("--file_type", help="Data file type.  E.g. pickle.gz,  mtx, csv, or tsv (default: pickle.gz)", default='pickle.gz')
+    parser.add_argument("--data_file", help="Name of data file (default: data.pickle.gz)", default='data.pickle.gz')
     parser.add_argument("--libsize_perc", help="int or tuple of ints, above or below which to retain a cell. Must be an integer between 0 and 100 (default: (5,95))", default=(5,95))
     parser.add_argument("--mit_cutoff", help="Remove cells with total expression of a mitochondrial genes above or below a threshold (default: 200)", default=200)
     parser.add_argument("--min_cells", help="Filter all genes with negligible counts in all but a few cells (default: 5)", default=5)
 
     return parser.parse_args()
 
-def load_data(datadir, filetype):
+def load_data(datadir, filetype, data_file):
     """
 
     :type datadir: object
     """
-    filetypes = ['10X', '10X_HDF5', '10X_zip', 'csv', 'fcs', 'mtx', 'tsv', 'pickle']
+    filetypes = ['10X', '10X_HDF5', '10X_zip', 'csv', 'fcs', 'mtx', 'tsv', 'pickle.gz']
     assert (filetype in filetypes), "Please enter file format from the following {}".format(filetypes)
 
-    if filetype == 'mtx':
-        data = scprep.io.load_mtx(os.path.join(datadir, 'matrix.mtx.gz'),
-                                  gene_names=os.path.join(datadir, 'features.tsv.gz'),
-                                  cell_names=os.path.join(datadir, 'barcodes.tsv.gz'),
-                                  cell_axis="column")
+    if filetype == 'pickle.gz':
+        data = pd.read_pickle(os.path.join(datadir, data_file))
 
     elif filetype == 'csv':
         data = scprep.io.load_csv(os.path.join(datadir, 'data.csv'))
@@ -70,15 +68,23 @@ def load_data(datadir, filetype):
     elif filetype == 'tsv':
         data = scprep.io.load_csv(os.path.join(datadir, 'data.tsv'))
     
-    elif filetype == 'pickle':
-        data = pd.read_pickle(os.path.join(datadir, 'data_raw.pickle.gz'))
+    elif filetype == 'mtx':
+        data = scprep.io.load_mtx(os.path.join(datadir, 'matrix.mtx.gz'),
+                                  gene_names=os.path.join(datadir, 'features.tsv.gz'),
+                                  cell_names=os.path.join(datadir, 'barcodes.tsv.gz'),
+                                  cell_axis="column")
+
 
     return data
 
 def filter_ercc(data):
+    """Remove UMIs from internal standards (old version)
+    """
     return data[[x for x in data.columns if 'ERCC' not in x]]
 
 def create_metadata(data):
+    """Create metadata file
+    """
     return pd.DataFrame(index = data.index)
 
 def filter_library_size(data, metadata, percentile):
@@ -86,6 +92,8 @@ def filter_library_size(data, metadata, percentile):
     return data, metadata
 
 def filter_mitochondrial_high_expression(data, metadata, cutoff):
+    """Remove cells with high mitochondrial gene expression
+    """
     mit_genes = ['rps8','cox1','cob','cox3','rps3','nad4',
              'rpl16','nad4L','nad2','nad3','cox2',
              'atp4','atp6','orf 104','nad5','atp9',
@@ -102,6 +110,8 @@ def filter_mitochondrial_high_expression(data, metadata, cutoff):
     return data, metadata
 
 def filter_low_expressing_genes(data, cutoff):
+    """ Remove cells with low number of UMIs
+    """
     return scprep.filter.filter_rare_genes(data, min_cells=cutoff)
 
 def normalize_libsize(data, metadata):
@@ -109,6 +119,8 @@ def normalize_libsize(data, metadata):
     return data, metadata
 
 def scale_data(data):
+    """Scale the UMI expression data with square-root transformation
+    """
     return scprep.transform.sqrt(data)
 
 if __name__ == '__main__':

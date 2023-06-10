@@ -41,13 +41,13 @@ def main():
         clusterings[alg] = cl_nu
     metadata = metadata.join(pd.DataFrame(clusterings, index=data_pca.index))
     print('Saving clustering data')
-    metadata.to_pickle(os.path.join(args.data_dir, str(args.metadata_file).replace(".pickle.gz","_clusters.pickle.gz")))
+    metadata.to_pickle(os.path.join(args.data_dir, str(args.metadata_file).replace(".pickle.gz",".clusters.pickle.gz")))
 
 def get_args():
     parser = ArgumentParser(description="Clustering single-cell data.")
-    parser.add_argument("--data_dir", help="path to direcory with single-cell PCA data, including file names: data_pca.pickle.gz and metadata_dim_reduction.pickle.gz", required=True)
-    parser.add_argument("--data_pca", help="name of data file as appear in data_dir (default: data_pca.pickle.gz)", default='data_pca.pickle.gz')
-    parser.add_argument("--metadata_file", help="name of metadata file as appear in data_dir (default: metadata_dim_reduction.pickle.gz)", default='metadata_dim_reduction.pickle.gz')
+    parser.add_argument("--data_dir", help="path to direcory with single-cell PCA data, including file names: data.scaled.pca.pickle.gz and metadata.scaled.dim_reduction.pickle.gz", required=True)
+    parser.add_argument("--data_pca", help="name of data file as appear in data_dir (default: data.scaled.pca.pickle.gz)", default='data.scaled.pca.pickle.gz')
+    parser.add_argument("--metadata_file", help="name of metadata file as appear in data_dir (default: metadata.scaled.dim_reduction.pickle.gz)", default='metadata.scaled.dim_reduction.pickle.gz')
     return parser.parse_args()
 
 def clust_phenogrph(data_pca):
