@@ -31,26 +31,28 @@ optional arguments:
                         Path to file for saving metadata (saving compressed
                         pickle.gz file)
 
-example: python3 01_raw_UMI_counts_MARSseq_data.py --data_dir ./marsseq_batches --batch_data batch_list.txt --data_outfile merged_umi_counts.pickle.gz --metadata_outfile merged_metadata.pickle.gz
+example: python3 01_raw_UMI_counts_MARSseq_data.py --data_dir ./ --batch_data MARS_Batches.txt --data_outfile data.pickle.gz --metadata_outfile metadata.pickle.gz
 ```
 
 ### Preprocessing: filter, normalize, scale
 ```
 usage: 02_filter_normalize_scale_single_cell_data.py [-h] --data_dir DATA_DIR
-                                                        [--file_type FILE_TYPE]
-                                                        [--libsize_perc LIBSIZE_PERC]
-                                                        [--mit_cutoff MIT_CUTOFF]
-                                                        [--min_cells MIN_CELLS]
+                                                     [--file_type FILE_TYPE]
+                                                     [--data_file DATA_FILE]
+                                                     [--libsize_perc LIBSIZE_PERC]
+                                                     [--mit_cutoff MIT_CUTOFF]
+                                                     [--min_cells MIN_CELLS]
 
 Preprocess Single-Cell Data: Filter, Normalize, Scale.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --data_dir DATA_DIR   path to direcory with 10X outputs: matrix.mtx.gz,
-                        features.tsv.gz, barcodes.tsv.gz)
+  --data_dir DATA_DIR   path to direcory with input files
   --file_type FILE_TYPE
-                        Note if the input count matrix is in format mtx, csv,
-                        or tsv (default: mtx)
+                        Data file type. E.g. pickle.gz, mtx, csv, or tsv
+                        (default: pickle.gz)
+  --data_file DATA_FILE
+                        Name of data file (default: data.pickle.gz)
   --libsize_perc LIBSIZE_PERC
                         int or tuple of ints, above or below which to retain a
                         cell. Must be an integer between 0 and 100 (default:
@@ -67,17 +69,26 @@ example: python3 02_filter_normalize_scale_single_cell_data.py --data_dir ./
 
 ### Dimentionality reduction
 ```
-usage: 03_dimentionality_reduction_single_cell_data.py [-h] --data_dir DATA_DIR
-                                                          [--pca_components PCA_COMPONENTS]
-                                                          [--tsne_perplexity TSNE_PERPLEXITY]
+usage: 03_dimensionality_reduction_single_cell_data.py [-h] --data_dir
+                                                       DATA_DIR
+                                                       [--data_file DATA_FILE]
+                                                       [--metadata_file METADATA_FILE]
+                                                       [--pca_components PCA_COMPONENTS]
+                                                       [--tsne_perplexity TSNE_PERPLEXITY]
 
 Dimentionality reduction for single-cell data.
 
 optional arguments:
   -h, --help            show this help message and exit
   --data_dir DATA_DIR   path to direcory with preprocessed single-cell data,
-                        including file names: data.pickle.gz and
-                        metadata.pickle.gz
+                        including file names: data.scaled.pickle.gz and
+                        metadata.scaled.pickle.gz
+  --data_file DATA_FILE
+                        name of data file as appear in data_dir (default:
+                        data.scaled.pickle.gz)
+  --metadata_file METADATA_FILE
+                        name of metadata file as appear in data_dir (default:
+                        metadata.scaled.pickle.gz)
   --pca_components PCA_COMPONENTS
                         Number of components to calculate for the PCA
                         (default: 50)
@@ -95,14 +106,21 @@ example: python3 03_dimentionality_reduction_single_cell_data.py --data_dir ./
 ### Clustering
 ```
 usage: 04_clustering_single_cell_data.py [-h] --data_dir DATA_DIR
+                                         [--data_pca DATA_PCA]
+                                         [--metadata_file METADATA_FILE]
 
 Clustering single-cell data.
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --data_dir DATA_DIR  path to direcory with single-cell PCA data, including
-                       file names: data_pca.pickle.gz and
-                       metadata_dim_reduction.pickle.gz
+  -h, --help            show this help message and exit
+  --data_dir DATA_DIR   path to direcory with single-cell PCA data, including
+                        file names: data.scaled.pca.pickle.gz and
+                        metadata.scaled.dim_reduction.pickle.gz
+  --data_pca DATA_PCA   name of data file as appear in data_dir (default:
+                        data.scaled.pca.pickle.gz)
+  --metadata_file METADATA_FILE
+                        name of metadata file as appear in data_dir (default:
+                        metadata.scaled.dim_reduction.pickle.gz)
 
 example: python3 00.03.clustering_single_cell_data.py --data_dir ./
 ```
