@@ -1,0 +1,2 @@
+Amp.Batch.ID	Seq.Batch.ID	Batch.Set.ID	dataset	color	day	bag	gate
+ABEH3007	ABEH3007_MC70610	T17_7_HchlHsscNsyn	Ehux	darkgreen	T17	7	HchlHsscNsyn
