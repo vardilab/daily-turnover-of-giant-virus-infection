@@ -10,4 +10,4 @@ Code reoisitory the manuscript Hevroni et al. (2023) Daily turnover of active gi
 
 #### examples
 - `MARS_Batches.txt` - metadata format of MARS-Seq batch information 
-- `UMIs.txt` - tabular format of a raw UMI talbe; cell ids (columns); gene id (rows)
+- `UMIs.txt` - tabular format of a raw UMI talbe; cell id (columns); gene id (rows)
