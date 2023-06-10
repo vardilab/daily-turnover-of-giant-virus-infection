@@ -9,6 +9,5 @@ Code reoisitory the manuscript Hevroni et al. (2023) Daily turnover of active gi
 - `04_clustering_single_cell_data.py` - clustering
 
 #### examples
-- 
-- 
-- 
+- `MARS_Batches.txt` - metadata format of MARS-Seq batch information 
+- `UMIs.txt` - tabular format of a raw UMI talbe; cell ids (columns); gene id (rows)
